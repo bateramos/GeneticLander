@@ -14,4 +14,4 @@ while(true) {
 }
 
 console.log(data);
-fs.writeFile('data.json', JSON.stringify(data), 'utf8', () => {});
+fs.writeFile('public/data/data.json', 'var data = ' + JSON.stringify(data), 'utf8', () => {});

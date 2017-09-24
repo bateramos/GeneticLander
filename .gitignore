@@ -2,3 +2,4 @@
 node_modules
 *-lock.json
 data.json
+public/data/*.json

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Genetic Lander Generation Report</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="data/data.json"></script>
+</head>
+<body>
+  <div id="app">
+    <label> Select best fit of the generation </label>
+    <select id="genSelect"></select>
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+      },
+    });
+
+    data.forEach(function(gen) {
+      $("#genSelect").append(new Option("Generation " + gen.generation + " Fitness " + parseInt(gen.fitness), "" + gen.generation)); 
+    });
+
+    $("#genSelect").change(function() {
+      var value = $(this).val();
+      changeChartData(value);
+    });
+
+    changeChartData("0");
+
+    function changeChartData(gen) {
+      var genData = data.find(g => ""+g.generation === gen).data;
+      var thursterDataset = genData.map(d => d.thrusterSpeed);
+      var descentDataset = genData.map(d => d.descentSpeed);
+      var heightDataset = genData.map(d => d.height);
+      var labels = thursterDataset.map((a, index) => index % 10 ? "" : "" + (index/10 + 1));
+      chart.data.labels = labels;
+      chart.data.datasets = [
+          { label: "Thruster Speed", borderColor: '#CC0000', data: thursterDataset },
+          { label: "Descent Speed", borderColor: '#26FF04', data: descentDataset },
+          { label: "Height", borderColor: '#004C99', data: heightDataset }
+      ];
+      chart.update();
+    }
+  </script>
+</body>
+</html>

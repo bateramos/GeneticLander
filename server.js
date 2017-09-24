@@ -3,6 +3,7 @@
 // properties: 
 // 
 // actions: vertical thrusters
+const fs = require('fs');
 const Genetic = require('genetic-js-no-ww');
 const Lander = require('./Lander');
 
@@ -23,41 +24,72 @@ genetic.mutate = (lander) => {
   return new Lander(variables);
 };
 
-genetic.fitness = (landerData) => {
-  const lander = new Lander(
-    landerData.verticalThrusterLogicModule.variables
-  );
+function simulateDescent(lander, onTickEnd) {
   let timePassed = 0;
   let i = 0;
   while(i++ < 10 * 60 * 60 * 10) {
     timePassed += 0.1;
     lander.tick(timePassed);
+    onTickEnd(timePassed);
+    if (lander.error || lander.landed || lander.crashLanded) {
+      break;
+    }
+  }
+};
+
+genetic.fitness = (landerData) => {
+  const lander = new Lander(
+    landerData.verticalThrusterLogicModule.variables
+  );
+
+  let result = 0;
+
+  simulateDescent(lander, (timePassed) => {
     if (lander.error) {
-      return 0;
+      result = -100;
     }
     if (lander.landed) {
-      return (10 / timePassed) + 50;
+      result = (10 / timePassed) + 50;
     }
     if (lander.crashLanded) {
       const score = 10 / timePassed - (lander.descentSpeed * 5);
-      return score;
+      result = score;
     }
-  }
-  return lander.height / 10;
+  });
+
+  return result || lander.height / 10;
 };
 
 genetic.generation = (pop, gen, stats) => {
   return !pop.find(lander => lander.landed);
 };
 
+const bestFitness = [];
 genetic.notification = (pop, gen, stats, isFinished) => {
+  const bestFit = pop.sort((p1, p2) => p1.fitness < p2.fitness ? 1 : -1)[0];
+
+  const lander = new Lander(
+    bestFit.entity.verticalThrusterLogicModule.variables
+  );
+  const data = [];
+  simulateDescent(lander, (timePassed) => {
+    data.push({ height: lander.height, descentSpeed: lander.descentSpeed, thrusterSpeed: lander.thrusterSpeed});
+  });
+  
+  bestFitness.push({ generation: gen, fitness: bestFit.fitness, data });
   if (!isFinished) return;
-  console.log(pop.filter(p => p.fitness > 40).map(p => JSON.stringify(p)));
+
+  if (!fs.existsSync('public/data')){
+    fs.mkdirSync('public/data');
+  }
+  fs.writeFile('public/data/data.json', 'var data = ' + JSON.stringify(bestFitness), 'utf8', () => {
+    console.log('fitness report on public/index.html');
+  });
 };
 
 genetic.evolve({
   iterations: 1000,
   size: 400,
   mutation: 0.5,
-  skip: 100
+  skip: 50
 });
