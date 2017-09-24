@@ -24,34 +24,25 @@ genetic.mutate = (lander) => {
 };
 
 genetic.fitness = (landerData) => {
-  //console.log(landerData)
   const lander = new Lander(
-    landerData.verticalThrusterLogicModule.variables,
-    landerData.height,
-    landerData.descentSpeed
+    landerData.verticalThrusterLogicModule.variables
   );
   let timePassed = 0;
   let i = 0;
-  while(i++ < 10 * 60 * 60) {
+  while(i++ < 10 * 60 * 60 * 10) {
     timePassed += 0.1;
     lander.tick(timePassed);
     if (lander.error) {
       return 0;
     }
     if (lander.landed) {
-      console.log("Landed", lander);
       return (10 / timePassed) + 50;
     }
     if (lander.crashLanded) {
       const score = 10 / timePassed - (lander.descentSpeed * 5);
-      if (score > -10) {
-        console.log(lander);
-      }
-      //console.log("CrashLanded", timePassed,"score: " + score, "thruster: " + lander.thrusterSpeed, "descent: " + lander.descentSpeed);
       return score;
     }
   }
-  //console.log('timeout', "score: " + (lander.height / 10), "thruster: " + lander.thrusterSpeed, "descent: " + lander.descentSpeed);
   return lander.height / 10;
 };
 
@@ -60,7 +51,8 @@ genetic.generation = (pop, gen, stats) => {
 };
 
 genetic.notification = (pop, gen, stats, isFinished) => {
-  console.log(gen, stats, isFinished);
+  if (!isFinished) return;
+  console.log(pop.filter(p => p.fitness > 40).map(p => JSON.stringify(p)));
 };
 
 genetic.evolve({

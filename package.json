@@ -11,5 +11,7 @@
   "dependencies": {
     "genetic-js": "^0.1.14",
     "genetic-js-no-ww": "^0.2.1"
+  },
+  "devDependencies": {
   }
 }
