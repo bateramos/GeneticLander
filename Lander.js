@@ -4,7 +4,7 @@ const ACCELERATION = 1;
 const GRAVITY = 10;
 
 module.exports = class Lander {
-  constructor(logicVariables, height = 1000, descentSpeed = GRAVITY) {
+  constructor(logicVariables, height = 100, descentSpeed = GRAVITY) {
     this.height = height;
     this.descentSpeed = descentSpeed;
     this.thrusterSpeed = 0;
