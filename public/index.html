@@ -5,24 +5,53 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script src="data/data.json"></script>
+  <style type="text/css">
+    #myChart {
+      width:1000px !important;
+      height:600px !important;
+    }
+
+    #descent {
+      width:300px !important;
+      height:600px !important;
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      border: 1px solid black;
+    }
+  </style>
 </head>
 <body>
   <div id="app">
     <label> Select best fit of the generation </label>
     <select id="genSelect"></select>
-    <canvas id="myChart"></canvas>
+    <div >
+      <canvas id="myChart"></canvas>
+    </div>
+    <canvas id="descent"></canvas>
   </div>
 
   <script>
+    var intervalId = 0;
     var ctx = document.getElementById('myChart').getContext('2d');
+    var descentCtx = document.getElementById('descent').getContext('2d');
+    descentCtx.canvas.width  = 300;
+    descentCtx.canvas.height = 600;
+
     var chart = new Chart(ctx, {
       type: 'line',
-      data: {
-      },
+      data: {},
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          yAxes: [{ ticks: { beginAtZero:true } }]
+        }
+      }
     });
 
     data.forEach(function(gen) {
-      $("#genSelect").append(new Option("Generation " + gen.generation + " Fitness " + parseInt(gen.fitness), "" + gen.generation)); 
+      $("#genSelect").append(new Option("Generation " + gen.generation + " Fitness " + gen.fitness.toFixed(2), "" + gen.generation)); 
     });
 
     $("#genSelect").change(function() {
@@ -45,6 +74,29 @@
           { label: "Height", borderColor: '#004C99', data: heightDataset }
       ];
       chart.update();
+
+      descentCtx.clearRect(0, 0, 300, 600);
+      descentCtx.fillRect(140, 0, 10, 5);
+      clearInterval(intervalId);
+      var index = 0;
+      var timer = 100;
+      function animateDescent() {
+        const height = heightDataset[index];
+        const y = (height * 600) / 100;
+        if (!height) {
+          clearInterval(intervalId);
+          index = 0;
+          intervalId = setInterval(animateDescent, timer);
+          return;
+        }
+        descentCtx.clearRect(0, 0, 300, 600);
+        descentCtx.fillRect(140, 600 - y, 20, 20);
+        descentCtx.fillText('Speed ' + descentDataset[index].toFixed(3) + " m/s", 10, 10);
+        descentCtx.fillText('Thruster ' + descentDataset[index].toFixed(3) + " m/s", 10, 20);
+        descentCtx.fillText('Height ' + height.toFixed(3) + " m/s", 10, 30);
+        index++;
+      }
+      intervalId = setInterval(animateDescent, timer);
     }
   </script>
 </body>

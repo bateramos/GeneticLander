@@ -12,8 +12,11 @@ const genetic = Genetic.create();
 genetic.optimize = Genetic.Optimize.Maximize;
 genetic.select1 = Genetic.Select1.Sequential;
 
+const GRAVITY = 10;
+const INITIAL_HEIGHT = 100;
+
 genetic.seed = () => {
-  return new Lander([Math.random(), Math.random(), Math.random()]);
+  return new Lander([Math.random(), Math.random(), Math.random()], INITIAL_HEIGHT, GRAVITY);
 };
 
 genetic.mutate = (lander) => {
@@ -30,7 +33,7 @@ function simulateDescent(lander, onTickEnd) {
   // 60s
   while(i++ < 10 * 60) {
     timePassed += 0.1;
-    lander.tick(timePassed);
+    lander.tick(GRAVITY, timePassed);
     onTickEnd(timePassed);
     if (lander.error || lander.landed || lander.crashLanded) {
       break;
@@ -40,20 +43,24 @@ function simulateDescent(lander, onTickEnd) {
 
 genetic.fitness = (landerData) => {
   const lander = new Lander(
-    landerData.verticalThrusterLogicModule.variables
+    landerData.verticalThrusterLogicModule.variables,
+    INITIAL_HEIGHT, GRAVITY
   );
 
   let result = 0;
 
   simulateDescent(lander, (timePassed) => {
+    if (lander.height > INITIAL_HEIGHT * 2) {
+      lander.error = true;
+    }
     if (lander.error) {
       result = -100;
     }
     if (lander.landed) {
-      result = (10 / timePassed) + 50;
+      result = (10 / timePassed) + 25;
     }
     if (lander.crashLanded) {
-      const score = 10 / timePassed - (lander.descentSpeed * 5);
+      const score = 5 / timePassed - (lander.descentSpeed * 5);
       result = score;
     }
   });
@@ -72,7 +79,7 @@ genetic.notification = (pop, gen, stats, isFinished) => {
   simulateDescent(lander, (timePassed) => {
     data.push({ height: lander.height, descentSpeed: lander.descentSpeed, thrusterSpeed: lander.thrusterSpeed});
   });
-  console.log(gen, bestFit.fitness);
+  console.log(gen, bestFit.fitness, bestFit.entity.verticalThrusterLogicModule.variables);
   bestFitness.push({ generation: gen, fitness: bestFit.fitness, data });
   if (!isFinished) return;
 
