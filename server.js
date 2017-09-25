@@ -27,7 +27,8 @@ genetic.mutate = (lander) => {
 function simulateDescent(lander, onTickEnd) {
   let timePassed = 0;
   let i = 0;
-  while(i++ < 10 * 60 * 60 * 10) {
+  // 60s
+  while(i++ < 10 * 60) {
     timePassed += 0.1;
     lander.tick(timePassed);
     onTickEnd(timePassed);
@@ -57,11 +58,7 @@ genetic.fitness = (landerData) => {
     }
   });
 
-  return result || lander.height / 10;
-};
-
-genetic.generation = (pop, gen, stats) => {
-  return !pop.find(lander => lander.landed);
+  return result || lander.height / 20;
 };
 
 const bestFitness = [];
@@ -75,7 +72,7 @@ genetic.notification = (pop, gen, stats, isFinished) => {
   simulateDescent(lander, (timePassed) => {
     data.push({ height: lander.height, descentSpeed: lander.descentSpeed, thrusterSpeed: lander.thrusterSpeed});
   });
-  
+  console.log(gen, bestFit.fitness);
   bestFitness.push({ generation: gen, fitness: bestFit.fitness, data });
   if (!isFinished) return;
 

@@ -35,8 +35,11 @@ module.exports = class Lander {
     }
   }
 
-  verticalThruster(height, descentSpeed, descentTime, heightThrust) {
-    return this.verticalThrusterLogicModule.evaluate(height, descentSpeed, descentTime);
+  verticalThruster(...args) {
+    let thruster = this.verticalThrusterLogicModule.evaluate(args);
+    thruster = thruster < -50 ? -50 : thruster;
+    thruster = thruster > 50 ? 50 : thruster;
+    return thruster;
   }
 }
 

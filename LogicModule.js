@@ -3,7 +3,7 @@ module.exports = class LogicModule {
     this.variables = variables;
   }
 
-  evaluate(...args) {
+  evaluate(args) {
     let result = 1;
     args.forEach((item, index) => {
       result *= item * this.variables[index];
