@@ -6,7 +6,7 @@ module.exports = class LogicModule {
   evaluate(args) {
     let result = 1;
     args.forEach((item, index) => {
-      result *= item * this.variables[index];
+      result += item * this.variables[index];
     });
     return result / 100; 
   }

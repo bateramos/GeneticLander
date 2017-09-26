@@ -34,7 +34,7 @@ module.exports = class Lander {
 
   verticalThruster(...args) {
     let thruster = this.verticalThrusterLogicModule.evaluate(args);
-    thruster = thruster < 0 ? 0 : thruster;
+    thruster = thruster < -50 ? -50 : thruster;
     thruster = thruster > 50 ? 50 : thruster;
     return thruster;
   }

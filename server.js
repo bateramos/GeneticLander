@@ -22,7 +22,7 @@ genetic.seed = () => {
 genetic.mutate = (lander) => {
   const { variables } = lander.verticalThrusterLogicModule;
   for (let i = 0; i < variables.length; i++) {
-    variables[i] += Math.random() * (Math.random() > 0.5 ? 1 : -1) * 0.5;
+    variables[i] += Math.random() * (Math.random() > 0.5 ? 1 : -1);
   }
   return new Lander(variables);
 };
@@ -92,8 +92,8 @@ genetic.notification = (pop, gen, stats, isFinished) => {
 };
 
 genetic.evolve({
-  iterations: 1000,
+  iterations: 40000,
   size: 400,
-  mutation: 0.5,
-  skip: 50
+  mutation: 0.3,
+  skip: 1000
 });
