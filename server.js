@@ -13,7 +13,7 @@ genetic.optimize = Genetic.Optimize.Maximize;
 genetic.select1 = Genetic.Select1.Sequential;
 
 const GRAVITY = 10;
-const INITIAL_HEIGHT = 100;
+const INITIAL_HEIGHT = 10000;
 
 genetic.seed = () => {
   return new Lander([Math.random(), Math.random(), Math.random()], INITIAL_HEIGHT, GRAVITY);
@@ -24,14 +24,14 @@ genetic.mutate = (lander) => {
   for (let i = 0; i < variables.length; i++) {
     variables[i] += Math.random() * (Math.random() > 0.5 ? 1 : -1);
   }
-  return new Lander(variables);
+  return new Lander(variables, INITIAL_HEIGHT, GRAVITY);
 };
 
 function simulateDescent(lander, onTickEnd) {
   let timePassed = 0;
   let i = 0;
   // 60s
-  while(i++ < 10 * 60) {
+  while(i++ < 10 * 60 * 10) {
     timePassed += 0.1;
     lander.tick(GRAVITY, timePassed);
     onTickEnd(timePassed);
@@ -54,18 +54,16 @@ genetic.fitness = (landerData) => {
       lander.error = true;
     }
     if (lander.error) {
-      result = -100;
+      result = -1000;
     }
-    if (lander.landed) {
-      result = (10 / timePassed) + 25;
-    }
-    if (lander.crashLanded) {
-      const score = 5 / timePassed - (lander.descentSpeed * 5);
-      result = score;
+    if (lander.landed || lander.crashLanded) {
+      const timeFitness = 2 / timePassed;
+      const landingFitness = lander.height < 0 ? lander.height * 1000 : 1000;
+      result = timeFitness + landingFitness;
     }
   });
 
-  return result || lander.height / 20;
+  return result;
 };
 
 const bestFitness = [];
@@ -73,7 +71,8 @@ genetic.notification = (pop, gen, stats, isFinished) => {
   const bestFit = pop.sort((p1, p2) => p1.fitness < p2.fitness ? 1 : -1)[0];
 
   const lander = new Lander(
-    bestFit.entity.verticalThrusterLogicModule.variables
+    bestFit.entity.verticalThrusterLogicModule.variables,
+    INITIAL_HEIGHT, GRAVITY
   );
   const data = [];
   simulateDescent(lander, (timePassed) => {
@@ -92,8 +91,8 @@ genetic.notification = (pop, gen, stats, isFinished) => {
 };
 
 genetic.evolve({
-  iterations: 40000,
-  size: 400,
-  mutation: 0.3,
+  iterations: 10000,
+  size: 40,
+  mutation: 0.4,
   skip: 1000
 });

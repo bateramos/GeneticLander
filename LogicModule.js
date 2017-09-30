@@ -8,6 +8,6 @@ module.exports = class LogicModule {
     args.forEach((item, index) => {
       result += item * this.variables[index];
     });
-    return result / 100; 
+    return result; 
   }
 }
