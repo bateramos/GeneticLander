@@ -1,12 +1,12 @@
 const LogicModule = require('./LogicModule');
 
 module.exports = class Lander {
-  constructor(logicVariables, height = 100, descentSpeed = 10) {
+  constructor(logicModule, height = 100, descentSpeed = 10) {
     this.initialHeight = height;
     this.height = height;
     this.descentSpeed = descentSpeed;
     this.thrusterSpeed = 0;
-    this.verticalThrusterLogicModule = new LogicModule(logicVariables);
+    this.verticalThrusterLogicModule = logicModule;
   }
 
   tick(gravity, descentTime) {
@@ -15,7 +15,6 @@ module.exports = class Lander {
     }
     const tickTime = 1/10;
     this.descentSpeed += gravity * tickTime;
-    
     const thrusterSpeed = this.verticalThruster(this.height/this.initialHeight, this.descentSpeed/100, descentTime/100);
     this.thrusterSpeed = thrusterSpeed;
     this.descentSpeed -= thrusterSpeed * tickTime;
@@ -35,8 +34,8 @@ module.exports = class Lander {
 
   verticalThruster(...args) {
     let thruster = this.verticalThrusterLogicModule.evaluate(args);
-    thruster = thruster < -50 ? -50 : thruster;
     thruster = thruster > 50 ? 50 : thruster;
+    thruster = thruster < -50 ? -50 : thruster;
     return thruster;
   }
 }

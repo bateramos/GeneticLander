@@ -62,10 +62,11 @@
     changeChartData("0");
 
     function changeChartData(gen) {
-      var genData = data.find(g => ""+g.generation === gen).data;
+      var gen = data.find(g => ""+g.generation === gen);
+      var genData = gen.data;
       var thursterDataset = genData.map(d => d.thrusterSpeed);
       var descentDataset = genData.map(d => d.descentSpeed);
-      var heightDataset = genData.map(d => d.height);
+      var heightDataset = genData.map(d => d.height / 100);
       var labels = thursterDataset.map((a, index) => index % 10 ? "" : "" + (index/10 + 1));
       chart.data.labels = labels;
       chart.data.datasets = [
@@ -81,8 +82,8 @@
       var index = 0;
       var timer = 100;
       function animateDescent() {
-        const height = heightDataset[index];
-        const y = (height * 600) / 10000;
+        const height = heightDataset[index] * 100;
+        const y = (height * 600) / gen.height;
         if (!height) {
           clearInterval(intervalId);
           index = 0;
