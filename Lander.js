@@ -6,6 +6,7 @@ module.exports = class Lander {
     this.height = height;
     this.descentSpeed = descentSpeed;
     this.thrusterSpeed = 0;
+    this.thrusterUsage = 0;
     this.verticalThrusterLogicModule = logicModule;
   }
 
@@ -16,6 +17,7 @@ module.exports = class Lander {
     const tickTime = 1/10;
     this.descentSpeed += gravity * tickTime;
     const thrusterSpeed = this.verticalThruster(this.height/this.initialHeight, this.descentSpeed/100, descentTime/100);
+    this.thrusterUsage += Math.abs(thrusterSpeed);
     this.thrusterSpeed = thrusterSpeed;
     this.descentSpeed -= thrusterSpeed * tickTime;
 
