@@ -23,7 +23,7 @@ genetic.seed = () => {
 };
 
 function random(number = 0) {
-  return number + Math.random() * (Math.random() > 0.5 ? 1 : -1)
+  return number + Math.random() * (Math.random() > 0.5 ? 5 : -5)
 }
 
 function squashing(number) {
