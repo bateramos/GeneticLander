@@ -88,7 +88,8 @@ genetic.fitness = (landerData) => {
     if (lander.landed || lander.crashLanded) {
       const timeFitness = 1/timePassed;
       const landingFitness = lander.height < 0 ? lander.height * 10 : 1000;
-      result = timeFitness + landingFitness;
+      const thrusterUsageFitness = 1/lander.thrusterUsage;
+      result = timeFitness + landingFitness + thrusterUsageFitness;
     }
   });
 
